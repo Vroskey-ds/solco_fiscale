@@ -1,0 +1,671 @@
+\documentclass[12pt, a4paper]{article}
+
+% ── Encoding & Language ──────────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+
+% ── Layout ───────────────────────────────────────────────────────────────────
+\usepackage[top=2.5cm, bottom=2.5cm, left=3cm, right=3cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+
+% ── Typography ────────────────────────────────────────────────────────────────
+\usepackage{lmodern}
+\usepackage{microtype}
+
+% ── Tables ───────────────────────────────────────────────────────────────────
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{xcolor}
+\definecolor{headerblue}{RGB}{41, 82, 148}
+\definecolor{rowgray}{RGB}{240, 240, 240}
+
+% ── Graphics & Diagrams ───────────────────────────────────────────────────────
+\usepackage{graphicx}
+\usepackage{tikz}
+
+% ── Hyperlinks ────────────────────────────────────────────────────────────────
+\usepackage[colorlinks=true, linkcolor=headerblue, urlcolor=headerblue, citecolor=headerblue]{hyperref}
+
+% ── Misc ─────────────────────────────────────────────────────────────────────
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{titlesec}
+\usepackage{caption}
+
+% ── Header / Footer ──────────────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Solco Fiscale – Software Requirements Specification}
+\fancyhead[R]{\small v0.1 – \today}
+\fancyfoot[C]{\small Pagina \thepage\ di \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ── Section Formatting ───────────────────────────────────────────────────────
+\titleformat{\section}{\large\bfseries\color{headerblue}}{{\thesection}}{1em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\normalsize\itshape}{\thesubsubsection}{1em}{}
+
+% ── Custom Commands ───────────────────────────────────────────────────────────
+% Requirement entry: \req{ID}{Descrizione}
+\newcommand{\req}[2]{%
+  \noindent\textbf{[#1]} \quad #2
+}
+
+\begin{document}
+
+% ── Title Page ────────────────────────────────────────────────────────────────
+\begin{titlepage}
+  \centering
+  \vspace*{2cm}
+  {\Huge\bfseries\color{headerblue} Solco Fiscale\par}
+  \vspace{0.5cm}
+  {\large\itshape Sistema di Gestione del Catasto e Calcolo delle Imposte\par}
+  \vspace{2cm}
+  {\LARGE Software Requirements Specification\par}
+  \vspace{0.5cm}
+  {\large Versione 0.1 -- Bozza\par}
+  \vspace{3cm}
+  \begin{tabular}{ll}
+    \textbf{Cliente:}   & Agenzia Regionale, Emilia-Romagna \\[4pt]
+    \textbf{Progetto:}  & Solco Fiscale                     \\[4pt]
+    \textbf{Data:}      & \today                            \\[4pt]
+    \textbf{Stato:}     & Bozza iniziale                    \\[4pt]
+    \textbf{Standard:}  & IEEE 830-1998                     \\
+  \end{tabular}
+  \vfill
+  {\small Documento riservato -- uso interno al gruppo di sviluppo}
+\end{titlepage}
+
+% ── Change History ────────────────────────────────────────────────────────────
+\section*{Storico delle Revisioni}
+\begin{tabularx}{\textwidth}{lllX}
+  \toprule
+  \textbf{Versione} & \textbf{Data} & \textbf{Autore} & \textbf{Descrizione} \\
+  \midrule
+  0.1 & \today & Gruppo & Prima bozza -- struttura e requisiti preliminari \\
+  \bottomrule
+\end{tabularx}
+\vspace{1cm}
+
+% ── Table of Contents ─────────────────────────────────────────────────────────
+\tableofcontents
+\newpage
+
+% =============================================================================
+\section{Introduzione}
+% =============================================================================
+
+\subsection{Scopo del documento}
+
+Questo documento costituisce la \textit{Software Requirements Specification} (SRS) del sistema
+\textbf{Solco Fiscale}, redatta secondo lo standard IEEE~830-1998.
+
+Lo scopo è definire in modo chiaro e non ambiguo i requisiti funzionali e non funzionali
+concordati tra il committente (Agenzia Regionale Emilia-Romagna) e il gruppo di sviluppo,
+costituendo il contratto tecnico di riferimento per tutto il ciclo di vita del progetto.
+
+Il documento è destinato a:
+\begin{itemize}
+  \item Il committente, per approvazione e validazione dei requisiti.
+  \item Il gruppo di sviluppo, come riferimento per la progettazione e l'implementazione.
+  \item Il responsabile del collaudo, per la definizione dei criteri di accettazione.
+\end{itemize}
+
+\subsection{Ambito del sistema (\textit{Scope})}
+
+\textbf{Solco Fiscale} è un sistema web per la gestione delle imposte sui terreni agricoli
+catastali nella regione Emilia-Romagna. Il sistema sostituirà l'applicazione legacy
+attualmente in uso (sviluppata in Visual Basic, eseguita su macchine Windows~7 in rete locale).
+
+\medskip\noindent\textbf{Obiettivi principali:}
+\begin{enumerate}
+  \item Automatizzare l'importazione dei dati catastali forniti mensilmente dal Catasto.
+  \item Calcolare le imposte fondiarie utilizzando l'algoritmo esistente (da integrare).
+  \item Gestire il flusso di approvazione mensile e l'invio delle notifiche ai contribuenti.
+  \item Mantenere uno storico completo delle operazioni e garantire la tracciabilità.
+\end{enumerate}
+
+\medskip\noindent\textbf{Fuori ambito (versione 1.0):}
+\begin{itemize}
+  \item Portale pubblico per i contribuenti con autenticazione SPID.
+  \item Applicazione mobile.
+  \item Integrazione diretta in tempo reale con le banche dati del Catasto nazionale.
+  \item Analisi avanzate o reportistica BI.
+\end{itemize}
+
+\subsection{Definizioni, acronimi e abbreviazioni}
+
+\begin{longtable}{lp{10cm}}
+  \toprule
+  \textbf{Termine} & \textbf{Definizione} \\
+  \midrule
+  \endhead
+  SRS       & Software Requirements Specification \\
+  Catasto   & Ufficio del Catasto; ente che fornisce i dati fondiari mensili \\
+  Dato catastale & Record che descrive un terreno: codice fiscale del proprietario, superficie, tipo di terreno, Comune, Provincia \\
+  Imposta fondiaria & Tributo calcolato sul valore catastale del terreno \\
+  Algoritmo legacy & Algoritmo di calcolo delle imposte attualmente implementato in Visual Basic \\
+  Operatore & Utente con privilegi limitati (inserimento dati, visualizzazione) \\
+  Responsabile di Area & Utente con autorità di approvazione delle operazioni critiche \\
+  Amministratore & Utente IT con accesso completo al sistema \\
+  PDF di notifica & Documento generato dal sistema e inviato ai contribuenti \\
+  Flusso mensile & Sequenza: importazione dati $\to$ calcolo imposte $\to$ approvazione $\to$ invio notifiche \\
+  SPID      & Sistema Pubblico di Identità Digitale (identità digitale italiana) \\
+  RBAC      & Role-Based Access Control \\
+  \bottomrule
+\end{longtable}
+
+\subsection{Riferimenti}
+
+\begin{enumerate}
+  \item IEEE Std 830-1998 -- \textit{IEEE Recommended Practice for Software Requirements Specifications}
+  \item Verbale del colloquio con il cliente -- 30 marzo 2026 (\texttt{dondi\_requirment.md})
+  \item Note di analisi del business analyst (\texttt{giansoldati\_requirment.md})
+  \item Sintesi dei requisiti di sistema (\texttt{menozzi\_requirment.md})
+  \item Template Excel del Catasto (da acquisire)
+  \item Documentazione dell'algoritmo legacy Visual Basic (da acquisire)
+\end{enumerate}
+
+\subsection{Panoramica del documento}
+
+La Sezione~2 descrive il sistema a livello generale: contesto, utenti, vincoli e dipendenze.
+La Sezione~3 dettaglia i requisiti funzionali e non funzionali.
+L'Appendice riporta i modelli \textit{as-is} e \textit{to-be} del flusso operativo.
+
+% =============================================================================
+\section{Descrizione Generale}
+% =============================================================================
+
+\subsection{Prospettiva del prodotto}
+
+Solco Fiscale si inserisce nel contesto di un'agenzia regionale che gestisce l'imposizione
+fiscale sui terreni agricoli. Il sistema sostituisce un'applicazione desktop legacy e introduce:
+\begin{itemize}
+  \item Un'interfaccia web accessibile anche in modalità \textit{smart working}.
+  \item Un flusso di importazione dati semiautomatico in sostituzione dell'inserimento manuale.
+  \item Un motore di calcolo integrato con l'algoritmo legacy esistente.
+\end{itemize}
+
+\subsubsection{Interfaccia di sistema}
+
+Il sistema sarà erogato come applicazione web (client-server). La scelta dell'infrastruttura
+(Azure cloud vs.\ server on-premise) è ancora aperta e verrà concordata con il committente;
+il sistema deve essere progettato per supportare entrambe le opzioni senza modifiche
+architetturali sostanziali.
+
+\subsubsection{Interfaccia utente}
+
+Interfaccia web accessibile da browser moderni (Chrome, Edge, Firefox). Non è richiesta
+l'installazione di software sul client. L'interfaccia deve essere sufficientemente simile
+all'applicazione legacy da minimizzare il costo di riaddestramento degli operatori.
+
+\subsubsection{Interfaccia hardware}
+
+Gli utenti utilizzano attualmente PC con Windows~7. La soluzione web elimina la dipendenza
+dal sistema operativo client. Almeno un PC è dotato di connessione a Internet (necessaria
+per l'invio delle email).
+
+\subsubsection{Interfaccia software}
+
+\begin{itemize}
+  \item \textbf{Algoritmo legacy:} Da integrare come componente o servizio separato;
+        l'interfaccia esatta (chiamata diretta, microservizio, riscrittura) è da definire.
+  \item \textbf{Importazione Excel:} Il sistema deve leggere i file Excel forniti dal Catasto
+        nel formato attuale (schema da acquisire).
+  \item \textbf{Servizio email:} Invio tramite SMTP (server da concordare con il committente).
+  \item \textbf{Generazione PDF:} Libreria lato server per la produzione dei PDF di notifica.
+\end{itemize}
+
+\subsubsection{Interfaccia di comunicazione}
+
+\begin{itemize}
+  \item HTTPS per tutta la comunicazione web.
+  \item SMTP (con TLS) per l'invio delle email ai contribuenti.
+  \item Eventuale VPN per accesso remoto all'infrastruttura on-premise.
+\end{itemize}
+
+\subsubsection{Requisiti di memoria e archiviazione}
+
+Il volume dei dati è contenuto: circa 20--30 record catastali al mese con storico annuale.
+La stima del database è nell'ordine di poche decine di GB nel lungo periodo.
+Backup giornalieri richiesti (modalità da definire in base alla scelta infrastrutturale).
+
+\subsubsection{Inizializzazione, backup e ripristino}
+
+\begin{itemize}
+  \item Backup giornaliero automatico del database.
+  \item Procedura di ripristino documentata e testata prima del go-live.
+  \item Migrazione dei dati storici dal sistema legacy (piano da definire).
+\end{itemize}
+
+\subsection{Funzioni del prodotto (sintesi)}
+
+\begin{enumerate}
+  \item \textbf{Autenticazione e gestione degli accessi} -- login con ruolo assegnato.
+  \item \textbf{Importazione dati catastali} -- da file Excel con validazione e workflow di approvazione.
+  \item \textbf{Inserimento manuale} -- fallback per dati non importabili automaticamente.
+  \item \textbf{Calcolo delle imposte} -- tramite algoritmo legacy integrato, eseguito mensilmente.
+  \item \textbf{Approvazione e invio notifiche} -- flusso: calcolo $\to$ revisione manager $\to$ generazione PDF $\to$ invio email.
+  \item \textbf{Gestione dello storico} -- tracciamento di tutte le modifiche ai dati catastali.
+  \item \textbf{Audit log} -- registro delle operazioni utente, visibile solo agli amministratori.
+  \item \textbf{Ricerca e filtri} -- per territorio, codice fiscale, Provincia.
+\end{enumerate}
+
+\subsection{Caratteristiche degli utenti}
+
+\begin{tabularx}{\textwidth}{lXX}
+  \toprule
+  \textbf{Ruolo} & \textbf{Profilo} & \textbf{Competenze tecniche} \\
+  \midrule
+  Operatore & 4--5 impiegati, uso quotidiano del sistema per inserimento e verifica dati & Basse; formati Office, web browser \\
+  \addlinespace
+  Responsabile di Area & 1--2 responsabili, usano il sistema per approvazioni mensili & Medie; familiarità con Excel e email \\
+  \addlinespace
+  Amministratore IT & 1 persona, gestione tecnica del sistema & Elevate; gestione server/cloud \\
+  \bottomrule
+\end{tabularx}
+
+\subsection{Vincoli generali}
+
+\begin{itemize}
+  \item \textbf{Budget:} €\,50.000--60.000 (finanziamento regionale).
+  \item \textbf{Algoritmo di calcolo:} L'algoritmo legacy deve essere riutilizzato senza
+        alterarne la logica, salvo evidenze di malfunzionamento.
+  \item \textbf{Utenti concorrenti:} Massimo 5--6 operatori + 2--3 responsabili
+        simultaneamente; carico molto limitato.
+  \item \textbf{Volume dati:} Circa 20 file Excel al mese, ciascuno con circa 20 righe.
+  \item \textbf{Supporto post-lancio:} Da 6 a 12 mesi inclusi nel contratto.
+  \item \textbf{Conformità:} I dati fiscali e i dati personali dei contribuenti devono essere
+        trattati in conformità al GDPR.
+\end{itemize}
+
+\subsection{Assunzioni e dipendenze}
+
+\begin{itemize}
+  \item Il formato dei file Excel forniti dal Catasto rimane stabile nel tempo.
+  \item Il cliente fornirà la documentazione (o il sorgente) dell'algoritmo legacy VB
+        prima dell'inizio della fase di sviluppo.
+  \item È disponibile un server SMTP per l'invio delle email.
+  \item La scelta infrastrutturale (Azure vs.\ on-premise) sarà definita entro la fine
+        della fase di progettazione.
+  \item \textbf{[DA DECIDERE]} Strategia di migrazione dei dati storici dal sistema legacy.
+\end{itemize}
+
+\subsection{Requisiti rimandati}
+
+I seguenti elementi sono fuori ambito nella versione 1.0 ma dovranno essere
+considerati nell'architettura per non precluderne l'aggiunta futura:
+
+\begin{itemize}
+  \item Portale pubblico con autenticazione SPID per i contribuenti.
+  \item Applicazione mobile per gli operatori in smart working.
+  \item Integrazione con SMS per le notifiche ai contribuenti.
+  \item Reportistica avanzata e cruscotti analitici.
+\end{itemize}
+
+% =============================================================================
+\section{Requisiti Dettagliati}
+% =============================================================================
+
+\subsection{Interfaccia di sistema e frontend}
+
+Le pagine/schermate principali dell'applicazione web sono:
+
+\begin{itemize}
+  \item \textbf{Login} -- autenticazione username/password con selezione ruolo.
+  \item \textbf{Dashboard} -- riepilogo attività in corso (importazioni pendenti, approvazioni attese).
+  \item \textbf{Gestione dati catastali} -- lista, ricerca, inserimento/modifica record.
+  \item \textbf{Importazione Excel} -- upload file, anteprima dati, validazione, invio ad approvazione.
+  \item \textbf{Calcolo imposte} -- avvio manuale o schedulato, stato elaborazione, riepilogo risultati.
+  \item \textbf{Approvazione e invio notifiche} -- dashboard del Responsabile con lista PDF da approvare.
+  \item \textbf{Storico operazioni} -- log ricercabile (solo Amministratore).
+  \item \textbf{Gestione utenti} -- creazione/modifica/disattivazione account (solo Amministratore).
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Requisiti Funzionali}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Per ogni requisito sono indicati: identificatore, descrizione, input, output, comportamento
+in caso di errore e ruoli abilitati.
+
+% ── AUTH ─────────────────────────────────────────────────────────────────────
+\subsubsection{Autenticazione e controllo accessi}
+
+\begin{longtable}{@{}p{2.5cm}p{9.5cm}@{}}
+  \toprule
+  \textbf{ID} & \textbf{Descrizione} \\
+  \midrule
+  \endhead
+
+  AUTH-01 &
+  Il sistema deve permettere il login tramite username e password. In caso di credenziali
+  errate, deve mostrare un messaggio generico senza rivelare quale campo è sbagliato.
+  Dopo 5 tentativi falliti consecutivi, l'account viene temporaneamente bloccato. \\[6pt]
+
+  AUTH-02 &
+  Il sistema deve implementare RBAC con tre ruoli: \textbf{Amministratore},
+  \textbf{Responsabile di Area}, \textbf{Operatore}. Ogni pagina e funzione è accessibile
+  solo dai ruoli autorizzati; accessi non consentiti restituiscono HTTP 403. \\[6pt]
+
+  AUTH-03 &
+  La sessione utente deve scadere dopo 30 minuti di inattività; l'utente viene reindirizzato
+  alla pagina di login senza perdita di dati non salvati (warning preventivo). \\[6pt]
+
+  AUTH-04 &
+  Solo l'Amministratore può creare, modificare, disattivare account utente. La disattivazione
+  non cancella i dati storici associati all'account. \\
+
+  \bottomrule
+\end{longtable}
+
+% ── DATA ─────────────────────────────────────────────────────────────────────
+\subsubsection{Gestione dati catastali}
+
+\begin{longtable}{@{}p{2.5cm}p{9.5cm}@{}}
+  \toprule
+  \textbf{ID} & \textbf{Descrizione} \\
+  \midrule
+  \endhead
+
+  DATA-01 &
+  Il sistema deve permettere l'importazione di file Excel nel formato fornito dal Catasto.
+  Il file viene caricato dall'Operatore; il sistema esegue la validazione del formato e dei
+  dati (campi obbligatori, tipi, range). L'esito della validazione (lista errori per riga)
+  è mostrato prima di procedere. \\[6pt]
+
+  DATA-02 &
+  I record validati vengono messi in uno stato \textit{«in attesa di approvazione»};
+  il Responsabile di Area li revisiona e può approvarli o rifiutarli (con motivazione).
+  Solo i record approvati vengono confermati nel database. \\[6pt]
+
+  DATA-03 &
+  Il sistema deve permettere l'inserimento manuale di un singolo record catastale da parte
+  dell'Operatore (campi: codice fiscale proprietario, Comune, Provincia, superficie in m²,
+  tipo terreno). I campi obbligatori sono tutti. \\[6pt]
+
+  DATA-04 &
+  Nessun record catastale può essere eliminato fisicamente da Operatori o Responsabili.
+  Solo l'Amministratore può eseguire eliminazioni fisiche. Gli Operatori possono
+  \textit{disattivare} un record (eliminazione logica con tracciamento). \\[6pt]
+
+  DATA-05 &
+  Ogni modifica a un record catastale deve essere tracciata nello storico: utente,
+  timestamp, campo modificato, valore precedente, valore nuovo. \\[6pt]
+
+  DATA-06 &
+  Il sistema deve permettere di allegare file (PDF, ZIP) a un record catastale.
+  Dimensione massima del singolo allegato: \textbf{[DA DEFINIRE]} MB. \\[6pt]
+
+  DATA-07 &
+  Il sistema deve offrire funzioni di ricerca e filtraggio dei record per:
+  codice fiscale del proprietario, Comune, Provincia, tipo terreno, stato (attivo/disattivo). \\
+
+  \bottomrule
+\end{longtable}
+
+% ── CALC ─────────────────────────────────────────────────────────────────────
+\subsubsection{Calcolo delle imposte}
+
+\begin{longtable}{@{}p{2.5cm}p{9.5cm}@{}}
+  \toprule
+  \textbf{ID} & \textbf{Descrizione} \\
+  \midrule
+  \endhead
+
+  CALC-01 &
+  Il sistema deve integrare l'algoritmo di calcolo delle imposte fondiarie attualmente
+  implementato in Visual Basic. La logica di calcolo non deve essere alterata. \\[6pt]
+
+  CALC-02 &
+  Il calcolo deve poter essere avviato manualmente dal Responsabile di Area o schedulato
+  automaticamente (frequenza: mensile, giorno e ora da configurare). \\[6pt]
+
+  CALC-03 &
+  L'algoritmo opera su tutti i record catastali attivi. Il risultato per ciascun record
+  comprende: importo imposta, tipo imposta, scadenza di pagamento, modalità di pagamento.
+  I risultati sono salvati con riferimento al mese di calcolo. \\[6pt]
+
+  CALC-04 &
+  In caso di errore durante il calcolo (es.\ dati mancanti, errore algoritmo), il sistema
+  deve registrare l'errore nell'audit log, notificare l'Amministratore e non sovrascrivere
+  i risultati precedenti. \\
+
+  \bottomrule
+\end{longtable}
+
+% ── NOTIF ─────────────────────────────────────────────────────────────────────
+\subsubsection{Generazione e invio notifiche}
+
+\begin{longtable}{@{}p{2.5cm}p{9.5cm}@{}}
+  \toprule
+  \textbf{ID} & \textbf{Descrizione} \\
+  \midrule
+  \endhead
+
+  NOTIF-01 &
+  Dopo il calcolo mensile, il sistema deve generare automaticamente un PDF di notifica per
+  ciascun contribuente, contenente: dettaglio terreni, importo imposta, scadenze. \\[6pt]
+
+  NOTIF-02 &
+  I PDF generati devono essere presentati al Responsabile di Area in una dashboard di
+  revisione. Il Responsabile può approvarli (singolarmente o in blocco) o rifiutarli. \\[6pt]
+
+  NOTIF-03 &
+  Dopo l'approvazione, il sistema invia i PDF via email ai rispettivi contribuenti.
+  L'invio può essere avviato manualmente (pulsante «Invia») o in modo schedulato. \\[6pt]
+
+  NOTIF-04 &
+  Il sistema deve registrare per ogni email: destinatario, timestamp invio, esito
+  (successo/fallimento). In caso di fallimento, l'Operatore viene notificato. \\[6pt]
+
+  NOTIF-05 &
+  I PDF approvati e inviati devono essere archiviati nel sistema e associabili al relativo
+  mese di competenza per futura consultazione. \\
+
+  \bottomrule
+\end{longtable}
+
+% ── AUDIT ─────────────────────────────────────────────────────────────────────
+\subsubsection{Audit log}
+
+\begin{longtable}{@{}p{2.5cm}p{9.5cm}@{}}
+  \toprule
+  \textbf{ID} & \textbf{Descrizione} \\
+  \midrule
+  \endhead
+
+  AUDIT-01 &
+  Il sistema deve registrare in un log tutte le operazioni significative: login/logout,
+  import file, modifiche a record catastali, approvazioni, invii email, modifiche utenti.
+  Ogni voce del log contiene: timestamp, utente, tipo operazione, dettaglio. \\[6pt]
+
+  AUDIT-02 &
+  L'audit log è accessibile in sola lettura esclusivamente dall'Amministratore.
+  Non deve essere possibile modificare o eliminare voci del log dall'interfaccia applicativa. \\[6pt]
+
+  AUDIT-03 &
+  Il log deve essere ricercabile per intervallo di date, utente, tipo di operazione. \\
+
+  \bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Requisiti Non Funzionali}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsubsection{Prestazioni}
+
+\begin{longtable}{@{}p{2.5cm}p{9.5cm}@{}}
+  \toprule
+  \textbf{ID} & \textbf{Descrizione} \\
+  \midrule
+  \endhead
+
+  PERF-01 &
+  Il tempo di risposta per le operazioni interattive (caricamento pagine, ricerche, salvataggio
+  record) deve essere inferiore a 7 secondi nel 90\% dei casi, con un numero di utenti
+  concorrenti fino a 10. \\[6pt]
+
+  PERF-02 &
+  Il processo di importazione di un file Excel con 20 righe deve completarsi (validazione
+  inclusa) in meno di 30 secondi. \\[6pt]
+
+  PERF-03 &
+  Il calcolo mensile delle imposte sull'intera base dati deve completarsi in meno di
+  \textbf{[DA DEFINIRE]} minuti (dipende dalla dimensione storica dei dati; da concordare
+  dopo analisi dell'algoritmo legacy). \\
+
+  \bottomrule
+\end{longtable}
+
+\subsubsection{Affidabilità e disponibilità}
+
+\begin{longtable}{@{}p{2.5cm}p{9.5cm}@{}}
+  \toprule
+  \textbf{ID} & \textbf{Descrizione} \\
+  \midrule
+  \endhead
+
+  AVAIL-01 &
+  Il sistema deve essere disponibile durante l'orario lavorativo (lun--ven, 08:00--18:00)
+  con un uptime target del 99\% (escluse finestre di manutenzione pianificate). \\[6pt]
+
+  AVAIL-02 &
+  Il backup del database deve essere eseguito giornalmente (fuori orario lavorativo).
+  Il Recovery Point Objective (RPO) è di 24 ore; il Recovery Time Objective (RTO) è
+  \textbf{[DA DEFINIRE]}. \\
+
+  \bottomrule
+\end{longtable}
+
+\subsubsection{Sicurezza}
+
+\begin{longtable}{@{}p{2.5cm}p{9.5cm}@{}}
+  \toprule
+  \textbf{ID} & \textbf{Descrizione} \\
+  \midrule
+  \endhead
+
+  SEC-01 &
+  Tutta la comunicazione tra client e server deve avvenire tramite HTTPS (TLS 1.2 o
+  superiore). \\[6pt]
+
+  SEC-02 &
+  Le password degli utenti devono essere salvate con hashing e salting (es.\ bcrypt o
+  Argon2). Non devono mai essere memorizzate in chiaro. \\[6pt]
+
+  SEC-03 &
+  I dati personali dei contribuenti e i dati fiscali devono essere trattati in conformità
+  al Regolamento UE 2016/679 (GDPR). \\[6pt]
+
+  SEC-04 &
+  \textbf{[DA APPROFONDIRE]} Crittografia dei dati a riposo nel database (valutare in
+  base alla scelta infrastrutturale cloud vs.\ on-premise). \\
+
+  \bottomrule
+\end{longtable}
+
+\subsubsection{Manutenibilità e portabilità}
+
+\begin{longtable}{@{}p{2.5cm}p{9.5cm}@{}}
+  \toprule
+  \textbf{ID} & \textbf{Descrizione} \\
+  \midrule
+  \endhead
+
+  MAINT-01 &
+  Il codice sorgente deve essere versionato con git e ospitato nel repository del progetto.
+  Ogni funzionalità deve essere sviluppata su branch separati con pull request e code review. \\[6pt]
+
+  PORT-01 &
+  Il sistema deve poter essere eseguito sia su infrastruttura Azure che su un server
+  on-premise Windows/Linux, senza modifiche al codice applicativo (solo configurazione). \\
+
+  \bottomrule
+\end{longtable}
+
+\subsubsection{Vincoli generali e conformità}
+
+\begin{longtable}{@{}p{2.5cm}p{9.5cm}@{}}
+  \toprule
+  \textbf{ID} & \textbf{Descrizione} \\
+  \midrule
+  \endhead
+
+  CONST-01 &
+  L'interfaccia utente deve essere fruibile dai browser: Google Chrome (ultima versione),
+  Microsoft Edge (ultima versione), Mozilla Firefox (ultima versione). \\[6pt]
+
+  CONST-02 &
+  Il sistema deve prevedere un ambiente di \textit{staging} separato dalla produzione per
+  i test pre-rilascio. \\[6pt]
+
+  CONST-03 &
+  Il contratto include 6--12 mesi di supporto post-lancio: correzione di bug, assistenza
+  agli utenti, aggiornamenti di sicurezza minori. \\
+
+  \bottomrule
+\end{longtable}
+
+% =============================================================================
+\appendix
+\section{Flusso Operativo As-Is e To-Be}
+% =============================================================================
+
+\subsection{Flusso As-Is (sistema attuale)}
+
+\begin{enumerate}
+  \item Il Catasto invia i file Excel mensilmente.
+  \item Un operatore inserisce manualmente i dati nel sistema VB su PC Windows~7.
+  \item Il sistema calcola le imposte.
+  \item Un responsabile rivede i risultati.
+  \item Un operatore genera i PDF e invia le email manualmente da un PC con internet.
+\end{enumerate}
+
+\subsection{Flusso To-Be (sistema proposto)}
+
+\begin{enumerate}
+  \item Il Catasto invia i file Excel mensilmente.
+  \item L'Operatore carica il file nel sistema web (da qualsiasi PC, anche in smart working).
+  \item Il sistema valida i dati e li mette in stato «in attesa».
+  \item Il Responsabile di Area approva i dati importati.
+  \item Il sistema esegue il calcolo delle imposte (schedulato o manuale).
+  \item Il sistema genera i PDF di notifica.
+  \item Il Responsabile di Area approva i PDF.
+  \item Il sistema invia automaticamente le email ai contribuenti.
+  \item Tutte le operazioni vengono registrate nell'audit log.
+\end{enumerate}
+
+% =============================================================================
+\section{Questioni Aperte}
+% =============================================================================
+
+Le seguenti decisioni sono ancora da concordare con il cliente o il gruppo di sviluppo:
+
+\begin{enumerate}
+  \item \textbf{Scelta infrastrutturale:} Azure cloud vs.\ server on-premise. Impatta su
+        sicurezza, backup, autenticazione e portabilità.
+  \item \textbf{Integrazione algoritmo legacy:} Chiamata diretta alla DLL VB, riscrittura
+        in linguaggio moderno, o esposizione come microservizio. Richiede l'accesso al
+        sorgente VB.
+  \item \textbf{Strategia di migrazione dati:} Come trasferire lo storico dal sistema legacy
+        al nuovo database (one-shot vs.\ migrazione graduale).
+  \item \textbf{Formato e schema Excel:} Lo schema del file fornito dal Catasto deve essere
+        documentato formalmente per implementare il parser.
+  \item \textbf{Dimensione massima allegati:} Limite per i file PDF/ZIP allegati ai record.
+  \item \textbf{RTO (Recovery Time Objective):} Tempo massimo di ripristino accettabile
+        in caso di disastro.
+  \item \textbf{Tempo massimo calcolo mensile:} Da misurare sull'algoritmo legacy con dati
+        reali per definire il SLA.
+  \item \textbf{Portale pubblico SPID:} Confermarne l'esclusione dalla v1.0 e pianificare
+        la v1.1.
+\end{enumerate}
+
+\end{document}
